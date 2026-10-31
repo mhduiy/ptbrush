@@ -62,6 +62,7 @@ export default defineComponent({
                     router>
                     <el-menu-item index="/dashboard">仪表盘</el-menu-item>
                     <el-menu-item index="/config">配置</el-menu-item>
+                    <el-menu-item index="/logs">运行日志</el-menu-item>
                 </el-menu>
                 <el-button
                     v-if="authState.login_required && authState.authenticated"

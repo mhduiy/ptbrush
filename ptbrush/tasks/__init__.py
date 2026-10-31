@@ -8,17 +8,15 @@
 '''
 
 # here put the import lib
-from time import sleep
 from loguru import logger
-from tasks.services import PtTorrentService, QBTorrentService, BrushService, vacuum_database as _vacuum_database
+from tasks.services import PtTorrentService, QBTorrentService, vacuum_database as _vacuum_database
 # 给所有任务加一个装饰器，进行错误捕获
 def catch_error(func):
     def wrapper():
         try:
             func()
-        except Exception as e:
-            # 这里还需要打印出函数名称
-            logger.error(f"任务执行出错: {str(e)}")
+        except Exception:
+            logger.opt(exception=True).error("任务 {} 执行出错", func.__name__)
     return wrapper
 
 
@@ -41,11 +39,8 @@ def fetch_qb_status():
 # 刷流
 @catch_error
 def brush():
-    add_torrent_count = BrushService().brush()
-    if add_torrent_count > 0:
-        logger.info(f"1分钟后,开始拆包任务...")
-        sleep(60)
-        QBTorrentService().torrent_thinned()
+    from tasks.runner import run_brush
+    run_brush()
     
 
 # 清理长时间没有上传的种子

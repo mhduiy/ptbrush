@@ -92,6 +92,45 @@ PTBrush提供`docker-compose`方式一行命令部署，**全部配置都可以�
 | 测试 QB 连接 | 配置页 → "qBittorrent 下载器" 头部 | 不写盘，仅试连一次返回成功/失败原因，支持用户名密码 / API Key 两种认证 |
 | 测试站点 | 配置页 → 每个站点卡片头部 | 尝试拉取 5 条 Free 种子验证 cookie / API key |
 | 配置不完整提示 | 仪表盘顶部 | 检测到 downloader / sites 缺关键字段时弹出引导 |
+| 运行日志 | 顶部菜单 → "运行日志" | 首次加载日志尾部，每 2 秒增量刷新；支持暂停、自动滚动和清空当前显示（不删除服务器日志） |
+| 立即执行一次 | 仪表盘 → "手动执行刷流" | 后台先采集 QB 状态、抓取 Free 种子再执行刷流；显示执行中、结束、跳过或失败，运行中禁止重复启动 |
+
+手动执行**忽略工作时间限制**，但仍遵守剩余磁盘空间、上传/下载速度和种子数量限制，不保证一定添加种子。未添加或失败时请打开运行日志查看具体原因。定时刷流每 15 分钟执行，站点抓种每 30 分钟执行；新配置也可以保存后立即手动验证。
+
+运行日志读取 `data/ptbrush.log`，保留原有 10 MB 轮转和 10 天留存策略；Python HTTPS 警告及调度异常也会写入日志，Docker 控制台同步输出应用日志。Web 日志会隐藏配置中的密码、API Key、Cookie、Header 值及下载链接查询参数，但仍可能包含站点和种子名称；建议在配置页设置 Web 登录密码，不要直接暴露到公网。日志页仅保留最近 20 万字符，完整历史查看 NAS 上的数据目录。
+
+### Fork 项目：使用自己的 Docker 镜像
+
+Fork 后可以自行修改和构建，不需要原作者发布镜像。**作者的镜像不会自动包含你 Fork 中的修改**，只重启原容器也不会更新源码。
+
+**方式一：在 NAS 上从自己的源码构建（无需镜像仓库）**
+
+把 Fork 中修改后的源码放到 NAS，在包含 `Dockerfile` 的项目根目录运行：
+
+```bash
+docker build -t ptbrush-local:latest .
+```
+
+将现有 Compose 配置中的 `image: huihuidehui/ptbrush:latest` 改为 `image: ptbrush-local:latest`，在同一 service 下设置 `pull_policy: never`（使用支持该字段的 Docker Compose v2），然后在 Compose 文件所在目录执行：
+
+```bash
+docker compose up -d --force-recreate ptbrush
+docker compose logs -f --tail=100 ptbrush
+```
+
+旧版只有 `docker-compose` 的 NAS 可用对应旧命令，并移除不支持的 `pull_policy`。请保留原来的端口、PUID/PGID、时区和**同一个数据目录到 `/app/data` 的挂载**，切换前备份数据目录，不要删除原数据。尤其从相对路径 `./data` 切换项目目录时，确认挂载仍指向原目录；它包含配置、数据库和日志。NAS 容器管理界面需选择重新创建或升级项目，而不只是重启容器。
+
+**方式二：让 Fork 的 GitHub Actions 发布自己的镜像**
+
+在自己的 GitHub 仓库启用 Actions，并在仓库 Secrets 中填写 `DOCKER_HUB_USERNAME`、`DOCKER_HUB_ACCESS_TOKEN`（具有推送权限的 Docker Hub token）。发布 Release 后，现有工作流会推送到 `你的DockerHub用户名/ptbrush:latest` 及对应 Release 标签，不再使用原作者的命名空间。NAS 改用你的镜像地址，再拉取并重新创建容器：
+
+```bash
+docker compose pull ptbrush
+docker compose up -d --force-recreate ptbrush
+```
+
+当前发布工作流在 GitHub 的默认 Linux runner 上构建单架构镜像，适用于对应架构的 NAS；ARM NAS 请优先在 NAS 本机按方式一构建，或自行配置匹配架构的构建流程。在其他电脑构建时也必须匹配 NAS 的 CPU 架构。
+
 
 ### 旧用户：手动编辑 toml 仍然可用
 

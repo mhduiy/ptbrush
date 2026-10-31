@@ -30,10 +30,12 @@ def create_app():
     from web.blueprints.api_auth import api_auth_bp
     from web.blueprints.api_config import api_config_bp
     from web.blueprints.api_stats import api_stats_bp
+    from web.blueprints.api_runtime import api_runtime_bp
 
     app.register_blueprint(api_auth_bp)
     app.register_blueprint(api_stats_bp)
     app.register_blueprint(api_config_bp)
+    app.register_blueprint(api_runtime_bp)
 
     @app.route("/api/version")
     def api_version():

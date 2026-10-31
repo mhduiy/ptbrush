@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Dashboard from './views/Dashboard.js';
 import Config from './views/Config.js';
 import Login from './views/Login.js';
+import Logs from './views/Logs.js';
 
 export const router = createRouter({
     history: createWebHistory(),
@@ -9,6 +10,7 @@ export const router = createRouter({
         { path: '/', redirect: '/dashboard' },
         { path: '/dashboard', component: Dashboard, meta: { title: '仪表盘' } },
         { path: '/config', component: Config, meta: { title: '配置' } },
+        { path: '/logs', component: Logs, meta: { title: '运行日志' } },
         { path: '/login', component: Login, meta: { title: '登录', public: true } },
     ],
 });

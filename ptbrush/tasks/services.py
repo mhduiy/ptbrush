@@ -322,8 +322,8 @@ class BrushService():
         torrent_db.brushed = True
         torrent_db.save()
 
-    def add_brush_torrent(self, torrents: List[Torrent]):
-
+    def add_brush_torrent(self, torrents: List[Torrent]) -> int:
+        added_count = 0
         for torrent in torrents:
             site_config = self._get_site_config(torrent.site)
             if not site_config:
@@ -347,10 +347,11 @@ class BrushService():
             if res:
                 logger.info(f"成功添加种子到QB: {torrent.name} (大小:{torrent.size/1024/1024:.2f}MB)")
                 self._set_brushed(torrent)
+                added_count += 1
             else:
                 logger.error(f"添加种子到QB失败: {torrent.name}")
 
-            # return res
+        return added_count
 
     def brush(self)->int:
         """
@@ -383,10 +384,10 @@ class BrushService():
         # 从种子库中取出评分较高的种子添加至QB中进行刷流
         torrents = self.get_brush_torrent(need_add_count)
         logger.info(f"从种子库中获取到{len(torrents)}个待添加种子，开始添加到QB中...")
-        self.add_brush_torrent(torrents)
+        added_count = self.add_brush_torrent(torrents)
 
-        logger.info(f"刷流任务完成，本次成功添加{len(torrents)}个新种子")
-        return len(torrents)
+        logger.info(f"刷流任务完成，本次成功添加{added_count}个新种子")
+        return added_count
 
 
 # 单独的 VACUUM 任务：原本每分钟在 clean_long_time_no_activate 里执行，

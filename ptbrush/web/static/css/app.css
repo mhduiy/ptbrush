@@ -238,7 +238,98 @@ body {
     margin-left: 0;
 }
 
+.page-alert,
+.task-panel {
+    margin-bottom: 16px;
+}
+
+.task-status,
+.log-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.log-actions .el-button + .el-button {
+    margin-left: 0;
+}
+
+.task-help,
+.log-help {
+    margin: 0 0 12px;
+}
+
+.task-message {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.task-failed {
+    color: #f56c6c;
+}
+
+.task-times {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.logs-page {
+    min-width: 0;
+}
+
+.log-output {
+    box-sizing: border-box;
+    margin: 12px 0 0;
+    max-width: 100%;
+    height: 60vh;
+    min-height: 240px;
+    max-height: 600px;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    padding: 12px;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    background: #1f2937;
+    color: #e5e7eb;
+    font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
 @media (max-width: 640px) {
+    .app-header {
+        height: auto !important;
+        min-height: 56px;
+        padding: 0 12px;
+        flex-wrap: wrap;
+        gap: 0 8px;
+    }
+
+    .app-brand {
+        flex: 1;
+        margin-right: 0;
+        padding: 12px 0;
+    }
+
+    .app-header .el-menu {
+        order: 3;
+        flex: 0 0 100%;
+        min-width: 0;
+        --el-menu-horizontal-height: 44px;
+    }
+
+    .app-header .el-menu-item {
+        flex: 1;
+        justify-content: center;
+        padding: 0 8px;
+    }
+
+    .task-status,
+    .log-actions {
+        width: 100%;
+    }
+
     .el-main {
         padding: 12px;
     }

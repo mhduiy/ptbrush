@@ -16,11 +16,24 @@ import tasks as tasks
 from config.config import BrushConfig, PTBrushConfig
 from web.server import start_web_server_thread
 import os
+import logging
+import sys
 from db import migrate_database
 
 # 设置不打印 debug 级别的日志，最小级别为 INFO
 logger.remove()  # 移除默认的 handler
-logger.add(Path(__file__).parent / 'data' / "ptbrush.log", rotation="10 MB", retention="10 days", level="INFO")
+logger.add(Path(__file__).parent / 'data' / "ptbrush.log", rotation="10 MB", retention="10 days", level="INFO", diagnose=False)
+logger.add(sys.stderr, level="INFO", diagnose=False)
+
+
+class TaskLogHandler(logging.Handler):
+    def emit(self, record):
+        logger.opt(exception=record.exc_info).log(record.levelname, record.getMessage())
+
+
+logging.captureWarnings(True)
+for log_name in ("apscheduler", "py.warnings"):
+    logging.getLogger(log_name).addHandler(TaskLogHandler())
 
 def check_work_time(brush_config:BrushConfig):
     """检查当前是否在工作时间内"""
@@ -88,7 +101,7 @@ def main():
         minute="*"
     )
     
-    # 每15分钟抓取一次PT站的种子
+    # 每30分钟抓取一次PT站的种子
     scheduler.add_job(
         tasks.fetch_pt_torrents, 
         "cron", 
