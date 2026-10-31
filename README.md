@@ -111,6 +111,8 @@ Fork 后可以自行修改和构建，不需要原作者发布镜像。**作者�
 docker build -t ptbrush-local:latest .
 ```
 
+镜像构建会统一 `/app` 源码的读取权限和目录访问权限，避免 NAS 构建上下文中的 `000` 权限导致非 root 用户启动时报 `python: can't open file '/app/main.py': [Errno 13] Permission denied`。旧镜像遇到此问题时，拉取最新源码、重新构建镜像并重新创建容器即可；无需改成 root 运行，也不要对数据目录执行 `chmod -R 777`。
+
 将现有 Compose 配置中的 `image: huihuidehui/ptbrush:latest` 改为 `image: ptbrush-local:latest`，在同一 service 下设置 `pull_policy: never`（使用支持该字段的 Docker Compose v2），然后在 Compose 文件所在目录执行：
 
 ```bash

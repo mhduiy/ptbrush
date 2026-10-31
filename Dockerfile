@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y gosu && apt-get clean \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && uv pip install --system --no-cache -r /app/requirements.txt \
+    && chmod -R u=rwX,go=rX /app \
     && chmod +x docker-entrypoint.sh \
     && useradd app
 
